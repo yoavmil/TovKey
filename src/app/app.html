@@ -1,93 +1,31 @@
-<div class="game-container">
-  <!-- Header / Score -->
-  <header class="game-header">
-    <h1 class="game-title">TovKey</h1>
-    <div class="stats">
-      <div class="stat">
-        <span class="stat-label">Score</span>
-        <span class="stat-value">{{ gameService.score() }}</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Combo</span>
-        <span class="stat-value combo" [class.hot]="gameService.combo() >= 3">
-          {{ gameService.combo() }}x
-        </span>
-      </div>
-    </div>
-  </header>
+<div class="portrait-warning">
+  <span>Rotate your device to landscape</span>
+</div>
 
-  <!-- Staff / Notes Area -->
-  <div class="staff-area">
-    @if (!gameService.isPlaying()) {
-      <div class="start-screen">
-        <h2>Ready to Practice?</h2>
-        <p>Press <strong>Space</strong> or click Start to begin</p>
-        <p class="hint">Use your computer keyboard (A S D F G H J K) or click the piano keys</p>
-        <button class="start-btn" (click)="startGame()">Start</button>
-      </div>
-    }
+<div class="sheet-section">
+  <div class="hud">
+    <button class="mic-btn" [class.on]="isListening()" (click)="toggleMic()">
+      {{ isListening() ? 'Mic On' : 'Mic Off' }}
+    </button>
+    <button class="new-btn" (click)="generateNotes()">New Notes</button>
 
-    @if (gameService.isPlaying()) {
-      <div class="staff-container">
-        <!-- Staff lines -->
-        <div class="staff">
-          <div class="staff-line" style="top: 12%"></div>
-          <div class="staff-line" style="top: 28%"></div>
-          <div class="staff-line" style="top: 44%"></div>
-          <div class="staff-line" style="top: 60%"></div>
-          <div class="staff-line" style="top: 76%"></div>
-
-          <!-- Play line (where notes need to be hit) -->
-          <div class="play-line"></div>
-
-          <!-- Falling notes -->
-          @for (note of gameService.fallingNotes(); track note.id) {
-            @if (!note.hit && !note.missed) {
-              <div
-                class="falling-note"
-                [class.hit]="note.hit"
-                [class.missed]="note.missed"
-                [style.right.%]="note.progress * 85"
-                [style.top.%]="12 + getStaffPosition(note.note) * 10.67"
-              >
-                <div class="note-head">
-                  <span class="note-letter">{{ getNoteLetter(note.note) }}</span>
-                </div>
-              </div>
-            }
-          }
-
-          <!-- Hit notes (show briefly) -->
-          @for (note of gameService.fallingNotes(); track note.id) {
-            @if (note.hit) {
-              <div
-                class="falling-note hit-anim"
-                [style.right.%]="note.progress * 85"
-                [style.top.%]="12 + getStaffPosition(note.note) * 10.67"
-              >
-                <div class="note-head correct-hit">
-                  <span class="note-letter">{{ getNoteLetter(note.note) }}</span>
-                </div>
-              </div>
-            }
-          }
-        </div>
-      </div>
+    @if (done()) {
+      <span class="feedback done">All done!</span>
+    } @else if (feedback() === 'correct') {
+      <span class="feedback correct">✓</span>
+    } @else if (feedback() === 'wrong') {
+      <span class="feedback wrong">✗</span>
+    } @else if (targetNote()) {
+      <span class="feedback hint">Play: <strong>{{ targetNote() }}</strong></span>
     }
   </div>
 
-  <!-- Piano Keyboard -->
-  <app-piano-keyboard />
+  <app-sheet-music
+    [notes]="notes()"
+    [states]="states()"
+  />
+</div>
 
-  <!-- Keyboard hints -->
-  <div class="keyboard-hints">
-    <span class="hint-key">A=C</span>
-    <span class="hint-key">S=D</span>
-    <span class="hint-key">D=E</span>
-    <span class="hint-key">F=F</span>
-    <span class="hint-key">G=G</span>
-    <span class="hint-key">H=A</span>
-    <span class="hint-key">J=B</span>
-    <span class="hint-key">K=C</span>
-  </div>
+<div class="keyboard-section">
+  <app-piano-keyboard [targetNote]="targetNote()" />
 </div>

@@ -6,8 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "deploy": "ng build --base-href=/TovKey/ && npx angular-cli-ghpages --dir=dist/key-tov/browser"
+    "test": "ng test"
   },
   "prettier": {
     "overrides": [
@@ -27,8 +26,10 @@
     "@angular/forms": "^20.1.0",
     "@angular/platform-browser": "^20.1.0",
     "@angular/router": "^20.1.0",
+    "pitchy": "^4.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "vexflow": "^5.0.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -36,7 +37,6 @@
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.0",
     "@types/jasmine": "~5.1.0",
-    "angular-cli-ghpages": "^2.0.1",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
