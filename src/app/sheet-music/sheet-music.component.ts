@@ -96,7 +96,7 @@ export class SheetMusicComponent implements OnInit, OnChanges, OnDestroy {
     this.notes.forEach((entry, i) => {
       const color = STATE_COLOR[this.states[i] ?? 'pending'];
       const makeNote = () => {
-        const n = new StaveNote({ keys: [entry.key], duration: 'q' });
+        const n = new StaveNote({ keys: [entry.key], duration: 'q', clef: entry.clef });
         if (entry.accidental) n.addModifier(new Accidental(entry.accidental));
         n.setStyle({ fillStyle: color, strokeStyle: color });
         return n;
@@ -113,7 +113,7 @@ export class SheetMusicComponent implements OnInit, OnChanges, OnDestroy {
 
     // Layout
     const staveHeight = 50;
-    const gap = 20;
+    const gap = 50;
     const totalH = hasTreble && hasBass ? staveHeight * 2 + gap : staveHeight;
     const startY = Math.max(12, (height - totalH) / 2);
 
