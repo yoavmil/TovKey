@@ -13,10 +13,14 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
     </div>
 
     <div class="page">
-      <header>
-        <h1>KeyTov</h1>
-        <p class="subtitle">Piano Practice</p>
-      </header>
+
+      <div class="sidebar">
+        <header>
+          <h1>KeyTov</h1>
+          <p class="subtitle">Piano Practice</p>
+        </header>
+        <button class="start-btn" (click)="start()">Start Practicing</button>
+      </div>
 
       <div class="card">
 
@@ -41,7 +45,7 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
                    (blur)="handleLeftFrom(lfl)"
                    (keydown.enter)="lfl.blur()" />
             <span class="sep">to</span>
-            <input #ltl type="text" placeholder="B4"
+            <input #ltl type="text" placeholder="C4"
                    [value]="leftTo()"
                    [disabled]="hand() === 'right'"
                    (input)="ltl.classList.toggle('bad', !valid(ltl.value))"
@@ -61,7 +65,7 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
                    (blur)="handleRightFrom(rfl)"
                    (keydown.enter)="rfl.blur()" />
             <span class="sep">to</span>
-            <input #rtl type="text" placeholder="B5"
+            <input #rtl type="text" placeholder="C5"
                    [value]="rightTo()"
                    [disabled]="hand() === 'left'"
                    (input)="rtl.classList.toggle('bad', !valid(rtl.value))"
@@ -90,32 +94,17 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
         </div>
 
       </div>
-
-      <button class="start-btn" (click)="start()">Start Practicing</button>
     </div>
   `,
   styles: [`
     :host {
-      display: block;
+      display: flex;
       min-height: 100dvh;
       width: 100dvw;
-      overflow-y: auto;
-      background: #f9f6f0;
-      font-family: system-ui, sans-serif;
-    }
-
-    .page {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
-      padding: 1.2rem 1rem;
-      width: 100%;
-      max-width: 460px;
-      min-height: 100dvh;
-      margin: 0 auto;
-      box-sizing: border-box;
+      background: #f9f6f0;
+      font-family: system-ui, sans-serif;
     }
 
     /* ── Portrait guard ─────────────────────────────────── */
@@ -136,7 +125,28 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
       .portrait-warning { display: flex; }
     }
 
-    /* ── Header ─────────────────────────────────────────── */
+    /* ── Two-column landscape page ──────────────────────── */
+    .page {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem 2rem;
+      width: 100%;
+      max-width: 780px;
+      box-sizing: border-box;
+    }
+
+    /* ── Sidebar: title + start button ─────────────────── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      flex-shrink: 0;
+    }
+
     header { text-align: center; }
 
     h1 {
@@ -157,14 +167,14 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
 
     /* ── Card ───────────────────────────────────────────── */
     .card {
+      flex: 1;
       background: #fff;
       border-radius: 14px;
       box-shadow: 0 2px 16px rgba(0, 0, 0, 0.09);
-      padding: 0.85rem 1.1rem;
-      width: 100%;
+      padding: 0.75rem 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.7rem;
+      gap: 0.55rem;
     }
 
     .row {
@@ -180,7 +190,7 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
     }
 
     .label {
-      width: 90px;
+      width: 84px;
       font-size: 0.78rem;
       font-weight: 600;
       color: #555;
@@ -195,7 +205,7 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
     }
 
     .btn-group button {
-      padding: 0.27rem 0.65rem;
+      padding: 0.25rem 0.6rem;
       border-radius: 20px;
       border: 2px solid #ddd;
       background: #f5f5f5;
@@ -225,7 +235,7 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
 
     .range-group input {
       width: 44px;
-      padding: 0.27rem 0.4rem;
+      padding: 0.25rem 0.4rem;
       border: 2px solid #ddd;
       border-radius: 8px;
       font-size: 0.85rem;
@@ -255,7 +265,7 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
 
     /* ── Start button ───────────────────────────────────── */
     .start-btn {
-      padding: 0.65rem 2.2rem;
+      padding: 0.65rem 2rem;
       border-radius: 30px;
       border: none;
       background: #1565c0;
@@ -266,6 +276,7 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
       box-shadow: 0 3px 10px rgba(21, 101, 192, 0.35);
       transition: background 0.15s, transform 0.1s;
       letter-spacing: 0.02em;
+      white-space: nowrap;
     }
 
     .start-btn:hover  { background: #0d47a1; }
