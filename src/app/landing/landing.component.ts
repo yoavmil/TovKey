@@ -8,6 +8,10 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
   selector: 'app-landing',
   standalone: true,
   template: `
+    <div class="portrait-warning">
+      <span>Rotate your device to landscape</span>
+    </div>
+
     <div class="page">
       <header>
         <h1>KeyTov</h1>
@@ -92,24 +96,44 @@ import { ALL_NATURAL_NOTES } from '../note-utils';
   `,
   styles: [`
     :host {
-      display: flex;
+      display: block;
       min-height: 100dvh;
       width: 100dvw;
-      align-items: center;
-      justify-content: center;
+      overflow-y: auto;
       background: #f9f6f0;
       font-family: system-ui, sans-serif;
-      overflow: auto;
     }
 
     .page {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 1rem;
       padding: 1.2rem 1rem;
       width: 100%;
       max-width: 460px;
+      min-height: 100dvh;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* ── Portrait guard ─────────────────────────────────── */
+    .portrait-warning {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #1e0f02;
+      color: #f5f2ec;
+      font-size: 1.1rem;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    @media (orientation: portrait) {
+      .page { display: none; }
+      .portrait-warning { display: flex; }
     }
 
     /* ── Header ─────────────────────────────────────────── */

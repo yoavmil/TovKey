@@ -47,9 +47,20 @@ export class PracticeComponent {
     const s = this.svc.settings();
     const pool = buildNotePool(s.hand, s.rightFrom, s.rightTo, s.leftFrom, s.leftTo, s.includeAccidentals);
     const count = s.notesCount;
-    const notes = Array.from({ length: count }, () =>
-      pool[Math.floor(Math.random() * pool.length)]
-    );
+
+    const pick = (p: NoteEntry[]) => p[Math.floor(Math.random() * p.length)];
+    let notes: NoteEntry[];
+
+    const treble = pool.filter(n => n.clef === 'treble');
+    const bass   = pool.filter(n => n.clef === 'bass');
+    if (s.hand === 'both' && count >= 2 && treble.length && bass.length) {
+      // Guarantee at least one note from each clef, then fill the rest randomly
+      const seed = [pick(treble), pick(bass)];
+      const rest = Array.from({ length: count - 2 }, () => pick(pool));
+      notes = [...seed, ...rest].sort(() => Math.random() - 0.5);
+    } else {
+      notes = Array.from({ length: count }, () => pick(pool));
+    }
     this.notes.set(notes);
     this.states.set(['active', ...Array<NoteState>(count - 1).fill('pending')]);
     this.currentIndex.set(0);

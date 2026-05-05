@@ -11,9 +11,9 @@ export interface PracticeSettings {
 export const DEFAULT_SETTINGS: PracticeSettings = {
   hand:      'right',
   rightFrom: 'C4',
-  rightTo:   'B5',
+  rightTo:   'C5',
   leftFrom:  'C3',
-  leftTo:    'B4',
+  leftTo:    'C4',
   notesCount: 4,
   includeAccidentals: false,
 };

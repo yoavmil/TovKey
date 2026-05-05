@@ -115,7 +115,7 @@ export class SheetMusicComponent implements OnInit, OnChanges, OnDestroy {
     const staveHeight = 50;
     const gap = 50;
     const totalH = hasTreble && hasBass ? staveHeight * 2 + gap : staveHeight;
-    const startY = Math.max(12, (height - totalH) / 2);
+    const startY = Math.max(30, (height - totalH) / 5);
 
     const voices: Voice[] = [];
     let trebleStave: Stave | undefined;
