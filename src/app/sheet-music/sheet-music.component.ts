@@ -46,10 +46,8 @@ export class SheetMusicComponent implements OnInit, OnChanges, OnDestroy {
   async ngOnInit(): Promise<void> {
     await Promise.all([Font.load('Bravura'), Font.load('Academico')]);
     this.fontsReady.set(true);
-    this.cdr.detectChanges(); // stamps #container into the DOM
+    this.cdr.detectChanges();
 
-    // ResizeObserver drives all renders — fires immediately on first observe
-    // and again on any layout change (orientation flip, window resize, etc.)
     this.ro = new ResizeObserver(() => this.redraw());
     this.ro.observe(this.container!.nativeElement);
   }
@@ -79,26 +77,77 @@ export class SheetMusicComponent implements OnInit, OnChanges, OnDestroy {
 
     const staveX = 10;
     const staveWidth = width - 20;
-    // Centre the stave vertically; clamp so notes above/below don't clip
-    const staveY = Math.max(12, (height - 50) / 2);
+    const count = this.notes.length;
 
-    const stave = new Stave(staveX, staveY, staveWidth);
-    stave.addClef('treble').addTimeSignature('4/4');
-    stave.setContext(context).draw();
+    const hasTreble = this.notes.some(n => n.clef !== 'bass');
+    const hasBass   = this.notes.some(n => n.clef === 'bass');
 
-    const staveNotes = this.notes.map((entry, i) => {
-      const note = new StaveNote({ keys: [entry.key], duration: 'q' });
-      if (entry.accidental) note.addModifier(new Accidental(entry.accidental));
+    // Build one tickable per beat for each staff.
+    // Where the note belongs to the other staff, insert a GhostNote (invisible spacer).
+    const rest = () => {
+      const r = new StaveNote({ keys: ['b/4'], duration: '4r' });
+      r.setStyle({ fillStyle: '#ccc', strokeStyle: '#ccc' });
+      return r;
+    };
+
+    const trebleTicks: StaveNote[] = [];
+    const bassTicks:   StaveNote[] = [];
+
+    this.notes.forEach((entry, i) => {
       const color = STATE_COLOR[this.states[i] ?? 'pending'];
-      note.setStyle({ fillStyle: color, strokeStyle: color });
-      return note;
+      const makeNote = () => {
+        const n = new StaveNote({ keys: [entry.key], duration: 'q' });
+        if (entry.accidental) n.addModifier(new Accidental(entry.accidental));
+        n.setStyle({ fillStyle: color, strokeStyle: color });
+        return n;
+      };
+
+      if (entry.clef === 'bass') {
+        trebleTicks.push(rest());
+        bassTicks.push(makeNote());
+      } else {
+        trebleTicks.push(makeNote());
+        bassTicks.push(rest());
+      }
     });
 
-    const voice = new Voice({ numBeats: 4, beatValue: 4 });
-    voice.setStrict(false);
-    voice.addTickables(staveNotes);
-    // ~100 px reserved for clef + time signature on the left
-    new Formatter().joinVoices([voice]).format([voice], staveWidth - 100);
-    voice.draw(context, stave);
+    // Layout
+    const staveHeight = 50;
+    const gap = 20;
+    const totalH = hasTreble && hasBass ? staveHeight * 2 + gap : staveHeight;
+    const startY = Math.max(12, (height - totalH) / 2);
+
+    const voices: Voice[] = [];
+    let trebleStave: Stave | undefined;
+    let trebleVoice: Voice | undefined;
+    let bassStave: Stave | undefined;
+    let bassVoice: Voice | undefined;
+
+    if (hasTreble) {
+      trebleStave = new Stave(staveX, startY, staveWidth);
+      trebleStave.addClef('treble').addTimeSignature(`${count}/4`);
+      trebleStave.setContext(context).draw();
+
+      trebleVoice = new Voice({ numBeats: count, beatValue: 4 }).setStrict(false);
+      trebleVoice.addTickables(trebleTicks);
+      voices.push(trebleVoice);
+    }
+
+    if (hasBass) {
+      const bassY = hasTreble ? startY + staveHeight + gap : startY;
+      bassStave = new Stave(staveX, bassY, staveWidth);
+      bassStave.addClef('bass').addTimeSignature(`${count}/4`);
+      bassStave.setContext(context).draw();
+
+      bassVoice = new Voice({ numBeats: count, beatValue: 4 }).setStrict(false);
+      bassVoice.addTickables(bassTicks);
+      voices.push(bassVoice);
+    }
+
+    // Format all voices together so beat positions align across staves
+    new Formatter().joinVoices(voices).format(voices, staveWidth - 100);
+
+    if (trebleVoice && trebleStave) trebleVoice.draw(context, trebleStave);
+    if (bassVoice   && bassStave)   bassVoice.draw(context, bassStave);
   }
 }

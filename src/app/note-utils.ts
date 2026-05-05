@@ -1,6 +1,7 @@
 export interface NoteEntry {
   key: string;        // VexFlow format: 'c/4', 'f#/5'
   accidental?: string;
+  clef: 'treble' | 'bass';
 }
 
 export type NoteState = 'pending' | 'active' | 'correct' | 'wrong';
@@ -32,8 +33,67 @@ export const NOTE_FREQUENCIES: Record<string, number> = {
   'A#5': 932.33, 'B5': 987.77,
 };
 
-export const NOTE_POOL: NoteEntry[] = [
-  { key: 'c/4' }, { key: 'd/4' }, { key: 'e/4' }, { key: 'f/4' },
-  { key: 'g/4' }, { key: 'a/4' }, { key: 'b/4' }, { key: 'c/5' },
-  { key: 'd/5' }, { key: 'e/5' }, { key: 'f#/5', accidental: '#' }, { key: 'g/5' },
+export const TREBLE_POOL: NoteEntry[] = [
+  { key: 'c/4', clef: 'treble' }, { key: 'd/4', clef: 'treble' }, { key: 'e/4', clef: 'treble' }, { key: 'f/4', clef: 'treble' },
+  { key: 'g/4', clef: 'treble' }, { key: 'a/4', clef: 'treble' }, { key: 'b/4', clef: 'treble' }, { key: 'c/5', clef: 'treble' },
+  { key: 'd/5', clef: 'treble' }, { key: 'e/5', clef: 'treble' }, { key: 'f#/5', accidental: '#', clef: 'treble' }, { key: 'g/5', clef: 'treble' },
 ];
+
+export const BASS_POOL: NoteEntry[] = [
+  { key: 'c/3', clef: 'bass' }, { key: 'd/3', clef: 'bass' }, { key: 'e/3', clef: 'bass' }, { key: 'f/3', clef: 'bass' },
+  { key: 'g/3', clef: 'bass' }, { key: 'a/3', clef: 'bass' }, { key: 'b/3', clef: 'bass' }, { key: 'c/4', clef: 'bass' },
+  { key: 'd/4', clef: 'bass' }, { key: 'e/4', clef: 'bass' },
+];
+
+export const NOTE_POOL: NoteEntry[] = [...TREBLE_POOL, ...BASS_POOL];
+
+/** All selectable natural notes, low to high. Used by the landing UI and buildNotePool. */
+export const ALL_NATURAL_NOTES: string[] = [
+  'C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3',
+  'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4',
+  'C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5',
+];
+
+// Notes that have a sharp (E and B do not)
+const HAS_SHARP = new Set(['C', 'D', 'F', 'G', 'A']);
+
+function rangePool(
+  from: string,
+  to: string,
+  clef: 'treble' | 'bass',
+  includeAccidentals: boolean,
+): NoteEntry[] {
+  const fromIdx = ALL_NATURAL_NOTES.indexOf(from);
+  const toIdx   = ALL_NATURAL_NOTES.indexOf(to);
+  if (fromIdx < 0 || toIdx < 0 || fromIdx > toIdx) return [];
+
+  const pool: NoteEntry[] = [];
+  for (let i = fromIdx; i <= toIdx; i++) {
+    const label = ALL_NATURAL_NOTES[i];       // 'C4'
+    const name  = label[0].toLowerCase();     // 'c'
+    const oct   = label.slice(-1);            // '4'
+    pool.push({ key: `${name}/${oct}`, clef });
+    if (includeAccidentals && HAS_SHARP.has(label[0])) {
+      pool.push({ key: `${name}#/${oct}`, accidental: '#', clef });
+    }
+  }
+  return pool;
+}
+
+export function buildNotePool(
+  hand: 'left' | 'right' | 'both',
+  rightFrom: string,
+  rightTo: string,
+  leftFrom: string,
+  leftTo: string,
+  includeAccidentals: boolean,
+): NoteEntry[] {
+  const pool: NoteEntry[] = [];
+  if (hand === 'right' || hand === 'both') {
+    pool.push(...rangePool(rightFrom, rightTo, 'treble', includeAccidentals));
+  }
+  if (hand === 'left' || hand === 'both') {
+    pool.push(...rangePool(leftFrom, leftTo, 'bass', includeAccidentals));
+  }
+  return pool.length ? pool : NOTE_POOL;
+}

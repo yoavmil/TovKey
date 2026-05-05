@@ -1,0 +1,115 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100dvw;
+  overflow: hidden;
+  background: #f9f6f0;
+  font-family: system-ui, sans-serif;
+}
+
+/* ── Sheet section ─────────────────────────────────────── */
+.sheet-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.hud {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+}
+
+app-sheet-music {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── HUD buttons ───────────────────────────────────────── */
+.back-btn,
+.mic-btn,
+.new-btn {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  border: 2px solid #888;
+  background: #f0f0f0;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  border-color: #bbb;
+  color: #555;
+}
+
+.back-btn:hover { background: #e0e0e0; }
+
+.mic-btn.on {
+  background: #c62828;
+  color: #fff;
+  border-color: #b71c1c;
+}
+
+.mic-btn:hover, .new-btn:hover { background: #e0e0e0; }
+.mic-btn.on:hover { background: #b71c1c; }
+
+/* ── Feedback label ────────────────────────────────────── */
+.feedback         { font-size: 0.95rem; }
+.feedback.correct { color: #2e7d32; font-size: 1.2rem; font-weight: 700; }
+.feedback.wrong   { color: #c62828; font-weight: 600; }
+.feedback.done    { color: #1565c0; font-weight: 600; }
+.feedback.hint    { color: #555; }
+
+.clef-badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: #e3f2fd;
+  color: #1565c0;
+  margin-right: 0.3rem;
+  vertical-align: middle;
+}
+
+.clef-badge.bass {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+/* ── Keyboard section ──────────────────────────────────── */
+.keyboard-section {
+  flex-shrink: 0;
+  height: 22dvh;
+  min-height: 80px;
+  max-height: 140px;
+}
+
+/* ── Portrait guard ────────────────────────────────────── */
+@media (orientation: portrait) {
+  .sheet-section,
+  .keyboard-section { display: none; }
+  .portrait-warning { display: flex; }
+}
+
+.portrait-warning {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #1e0f02;
+  color: #f5f2ec;
+  font-size: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}

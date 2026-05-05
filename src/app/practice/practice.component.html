@@ -1,0 +1,37 @@
+<div class="portrait-warning">
+  <span>Rotate your device to landscape</span>
+</div>
+
+<div class="sheet-section">
+  <div class="hud">
+    <button class="back-btn" (click)="goBack()">&#8592; Settings</button>
+    <button class="mic-btn" [class.on]="isListening()" (click)="toggleMic()">
+      {{ isListening() ? 'Mic On' : 'Mic Off' }}
+    </button>
+    <button class="new-btn" (click)="generateNotes()">New Notes</button>
+
+    @if (done()) {
+      <span class="feedback done">All done!</span>
+    } @else if (feedback() === 'correct') {
+      <span class="feedback correct">&#10003;</span>
+    } @else if (feedback() === 'wrong') {
+      <span class="feedback wrong">&#10007;</span>
+    } @else if (targetNote()) {
+      <span class="feedback hint">
+        <span class="clef-badge" [class.bass]="targetClef() === 'bass'">
+          {{ targetClef() === 'bass' ? 'Bass' : 'Treble' }}
+        </span>
+        Play: <strong>{{ targetNote() }}</strong>
+      </span>
+    }
+  </div>
+
+  <app-sheet-music
+    [notes]="notes()"
+    [states]="states()"
+  />
+</div>
+
+<div class="keyboard-section">
+  <app-piano-keyboard [targetNote]="targetNote()" />
+</div>
