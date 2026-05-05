@@ -26,6 +26,8 @@ export class PracticeComponent {
   protected feedback     = signal<'correct' | 'wrong' | null>(null);
   protected isListening  = this.audio.isListening;
 
+  private locked = false;
+
   protected targetNote = computed(() => {
     const note = this.notes()[this.currentIndex()];
     return note ? vexKeyToLabel(note.key) : null;
@@ -82,7 +84,7 @@ export class PracticeComponent {
   }
 
   private checkNote(detected: string): void {
-    if (this.done()) return;
+    if (this.done() || this.locked) return;
     const expected = this.targetNote();
     if (!expected) return;
 
@@ -90,18 +92,22 @@ export class PracticeComponent {
     const idx = this.currentIndex();
 
     if (detected === expected) {
+      this.locked = true;
       s[idx] = 'correct';
       this.feedback.set('correct');
       const next = idx + 1;
       if (next < this.notes().length) {
         s[next] = 'active';
         this.currentIndex.set(next);
+        this.states.set(s);
+        setTimeout(() => { this.locked = false; }, 800);
+        return;
       } else {
+        this.done.set(true);
         this.states.set(s);
         setTimeout(() => this.generateNotes(), 800);
         return;
       }
-      this.states.set(s);
     } else {
       s[idx] = 'wrong';
       this.states.set(s);
